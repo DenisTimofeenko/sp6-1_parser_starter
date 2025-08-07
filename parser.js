@@ -25,9 +25,15 @@ function parsePage() {
   const priceElement = productSection.querySelector(".price")
   const mainPriceText = priceElement.firstChild.nodeValue.trim()
   const oldPrice = document.querySelector(".price span").textContent
-  const descriptionOne = document.querySelector(".description").innerHTML
-  //   const h3 = document.querySelector("h3")
-  //   h3.classList.remove("unused")
+  const container = document.querySelector(".description")
+  //   container.querySelector('h3').classList.remove('unused');
+  const h3Element = document.querySelector(".description h3")
+  h3Element.removeAttribute("class")
+  const descriptionOne = container.innerHTML
+
+  // Или получаем чистый текст
+
+  //new code is upper
 
   let currency = ""
   if (priceElement.textContent.includes("₽")) {
@@ -53,7 +59,7 @@ function parsePage() {
       ).toFixed(2) + "%",
     currency: currency,
     properties: {},
-    description: descriptionOne,
+    description: descriptionOne.trim(),
     images: [],
   }
 
