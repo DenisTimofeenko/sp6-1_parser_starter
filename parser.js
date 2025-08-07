@@ -16,7 +16,7 @@ function parsePage() {
   ogMetaTags.forEach((tag) => {
     const property = tag.getAttribute("property")
     const key = property.split(":")[1]
-    const value = tag.getAttribute("content")
+    const value = tag.getAttribute("content").split("—")[0].trim()
     meta.opengraph[key] = value
   })
 
@@ -25,6 +25,10 @@ function parsePage() {
   const priceElement = productSection.querySelector(".price")
   const mainPriceText = priceElement.firstChild.nodeValue.trim()
   const oldPrice = document.querySelector(".price span").textContent
+  const descriptionOne = document.querySelector(".description").innerHTML
+  //   const h3 = document.querySelector("h3")
+  //   h3.classList.remove("unused")
+
   let currency = ""
   if (priceElement.textContent.includes("₽")) {
     currency = "RUB"
@@ -36,8 +40,8 @@ function parsePage() {
     name: productSection.querySelector("h1").textContent,
     isLiked: productSection.querySelector(".like").classList.contains("active"),
     tags: {},
-    price: mainPriceText.replace(/[^\d]/g, ""),
-    oldPrice: oldPrice.replace(/[^\d]/g, ""),
+    price: parseInt(mainPriceText.replace(/[^\d]/g, ""), 10),
+    oldPrice: parseInt(oldPrice.replace(/[^\d]/g, ""), 10),
     discount:
       oldPrice.replace(/[^\d]/g, "") - mainPriceText.replace(/[^\d]/g, ""),
     discountPercent:
@@ -49,11 +53,9 @@ function parsePage() {
       ).toFixed(2) + "%",
     currency: currency,
     properties: {},
-    description: productSection.querySelector(".description").textContent,
+    description: descriptionOne,
     images: [],
   }
-
-  // см выше описание
 
   product.tags = {
     category: [document.querySelector(".green").textContent],
@@ -92,16 +94,21 @@ function parsePage() {
   const suggested = []
 
   articles.forEach((article) => {
+    let currency = ""
+    if (article.querySelector("b").textContent.includes("₽")) {
+      currency = "RUB"
+    }
     const item = {
       name: document.querySelector("section.suggested article h3").textContent,
       description: document.querySelector("section.suggested article p")
         .textContent,
-      Image: document
+      image: document
         .querySelector("section.suggested article img")
         .getAttribute("src"),
-      price: document.querySelector("section.suggested article b").textContent,
-      currency: document.querySelector("section.suggested article b")
-        .textContent,
+      price: document
+        .querySelector("section.suggested article b")
+        .textContent.replace(/[^\d]/g, ""),
+      currency: currency,
     }
     suggested.push(item)
   })
@@ -123,7 +130,8 @@ function parsePage() {
       avatar: authorInfo.querySelector("img").src,
       name: authorInfo.querySelector("span").textContent.trim(),
     }
-    review.date = authorInfo.querySelector("i").textContent.trim()
+    const date = authorInfo.querySelector("i").textContent.trim()
+    review.date = date.replace(/\//g, ".")
     reviews.push(review)
   })
 
